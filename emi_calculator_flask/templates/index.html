@@ -85,30 +85,30 @@
                     <form action="/" method="POST" class="needs-validation" novalidate>
                         <div class="form-group">
                             <label for="loanAmount">Loan Amount (INR):</label>
-                            <input type="number" id="loanAmount" name="loanAmount" class="form-control" placeholder="Enter Loan Amount" required>
+                            <input type="number" id="loanAmount" name="loanAmount" class="form-control" placeholder="Enter Loan Amount" required value="{{ loan_amount }}">
                         </div>
 
                         <div class="form-group">
                             <label for="tenureYears">Tenure (Years):</label>
-                            <input type="number" id="tenureYears" name="tenureYears" class="form-control" placeholder="Enter Tenure in Years" required>
+                            <input type="number" id="tenureYears" name="tenureYears" class="form-control" placeholder="Enter Tenure in Years" required value="{{ tenure_years }}">
                         </div>
 
                         <div class="form-group">
                             <label for="interestRateFlat">Flat Interest Rate (%):</label>
-                            <input type="number" id="interestRateFlat" name="interestRateFlat" class="form-control" step="0.01" placeholder="Enter Flat Interest Rate" required>
+                            <input type="number" id="interestRateFlat" name="interestRateFlat" class="form-control" step="0.01" placeholder="Enter Flat Interest Rate" required value="{{ interest_rate_flat }}">
                         </div>
 
                         <div class="form-group">
                             <label for="interestRateReducing">Reducing Interest Rate (%):</label>
-                            <input type="number" id="interestRateReducing" name="interestRateReducing" class="form-control" step="0.01" placeholder="Enter Reducing Interest Rate" required>
+                            <input type="number" id="interestRateReducing" name="interestRateReducing" class="form-control" step="0.01" placeholder="Enter Reducing Interest Rate" required value="{{ interest_rate_reducing }}">
                         </div>
 
                         <div class="form-group">
                             <label for="loanType">Choose Loan Structure:</label>
                             <select id="loanType" name="loanType" class="form-control" onchange="toggleFields()" required>
-                                <option value="flat">Flat Structure</option>
-                                <option value="reducing">Reducing Structure</option>
-                                <option value="both">Compare Both</option>
+                                <option value="flat" {% if loan_type == 'flat' %}selected{% endif %}>Flat Structure</option>
+                                <option value="reducing" {% if loan_type == 'reducing' %}selected{% endif %}>Reducing Structure</option>
+                                <option value="both" {% if loan_type == 'both' %}selected{% endif %}>Compare Both</option>
                             </select>
                         </div>
 
