@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Loan Calculator</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS for Styling -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar-brand {
+            color: #fff;
+            font-weight: bold;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        .btn {
+            background-color: #007bff;
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .result-card {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.05);
+        }
+        h1, h3 {
+            color: #333;
+        }
+        p {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">EMI Loan Calculator</a>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <h1 class="text-center mb-4">Calculate Your EMI</h1>
+
+                    <!-- Flash Message for Error -->
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ messages[0] }}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <form action="/" method="POST" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="loanAmount">Loan Amount (INR):</label>
+                            <input type="number" id="loanAmount" name="loanAmount" class="form-control" placeholder="Enter Loan Amount" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tenureYears">Tenure (Years):</label>
+                            <input type="number" id="tenureYears" name="tenureYears" class="form-control" placeholder="Enter Tenure in Years" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interestRateFlat">Flat Interest Rate (%):</label>
+                            <input type="number" id="interestRateFlat" name="interestRateFlat" class="form-control" step="0.01" placeholder="Enter Flat Interest Rate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interestRateReducing">Reducing Interest Rate (%):</label>
+                            <input type="number" id="interestRateReducing" name="interestRateReducing" class="form-control" step="0.01" placeholder="Enter Reducing Interest Rate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loanType">Choose Loan Structure:</label>
+                            <select id="loanType" name="loanType" class="form-control" onchange="toggleFields()" required>
+                                <option value="flat">Flat Structure</option>
+                                <option value="reducing">Reducing Structure</option>
+                                <option value="both">Compare Both</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-block">Calculate EMI</button>
+                    </form>
+
+                    {% if emi_flat %}
+                    <div class="result-card mt-4">
+                        <h3>Flat Structure Results</h3>
+                        <p>EMI: <strong>{{ emi_flat }}</strong></p>
+                        <p>Total Interest: <strong>{{ total_interest_flat }}</strong></p>
+                        <p>Total Amount Payable: <strong>{{ total_amount_flat }}</strong></p>
+                    </div>
+                    {% endif %}
+
+                    {% if emi_reducing %}
+                    <div class="result-card mt-4">
+                        <h3>Reducing Structure Results</h3>
+                        <p>EMI: <strong>{{ emi_reducing }}</strong></p>
+                        <p>Total Interest: <strong>{{ total_interest_reducing }}</strong></p>
+                        <p>Total Amount Payable: <strong>{{ total_payment_reducing }}</strong></p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- JavaScript to Enable/Disable Fields -->
+    <script>
+        function toggleFields() {
+            const loanType = document.getElementById('loanType').value;
+            const flatRateField = document.getElementById('interestRateFlat');
+            const reducingRateField = document.getElementById('interestRateReducing');
+
+            if (loanType === 'flat') {
+                flatRateField.disabled = false;
+                reducingRateField.disabled = true;
+                reducingRateField.value = ''; // Clear value when disabled
+            } else if (loanType === 'reducing') {
+                flatRateField.disabled = true;
+                flatRateField.value = ''; // Clear value when disabled
+                reducingRateField.disabled = false;
+            } else {
+                flatRateField.disabled = false;
+                reducingRateField.disabled = false;
+            }
+        }
+
+        // Initial toggle in case the page loads with a selection
+        toggleFields();
+    </script>
+</body>
+</html>
